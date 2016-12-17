@@ -6,7 +6,7 @@
 1. Yes, create project from sources
 1. Select *import project from external model>maven*
 1. Enable *search for projects recursively*, *import maven files automatically*
-1. Next (should just be *lwjgl-natives-windows&gt;*)
+1. Next (should just be *lwjgl-natives-windows\&gt;*)
 1. Next (should be one project)
 1. Next (*use jdk 1.8*)
 1. Next (*should be com.bynarie.engine*)
