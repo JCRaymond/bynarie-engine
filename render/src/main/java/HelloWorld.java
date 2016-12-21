@@ -2,8 +2,6 @@ import org.lwjgl.*;
 import org.lwjgl.glfw.*;
 import org.lwjgl.opengl.*;
 
-import bynarie.engine.Thing;
-
 import static org.lwjgl.glfw.Callbacks.*;
 import static org.lwjgl.glfw.GLFW.*;
 import static org.lwjgl.opengl.GL11.*;
@@ -16,9 +14,6 @@ public class HelloWorld {
 
     public void run() {
         System.out.println("Hello LWJGL " + Version.getVersion() + "!");
-
-        Thing t = new Thing("Hello moules");
-        System.out.println("t = " + t);
 
         try {
             init();
