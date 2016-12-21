@@ -1,9 +1,9 @@
 package bynarie.engine;
 
-import bynarie.math.Vector3;
+import bynarie.math.Vector;
 
 public class Mesh
 {
     // TODO: Mesh class stub
-    private Vector3 bounds;
+    private Vector bounds;
 }
