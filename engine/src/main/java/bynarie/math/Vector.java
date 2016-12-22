@@ -1,11 +1,11 @@
 package bynarie.math;
 
 public class Vector {
-    public static final Vector ZERO  = new Vector(0,0,0);
-    public static final Vector ONE   = new Vector(1,1,1);
-    public static final Vector UNITX = new Vector(1,0,0);
-    public static final Vector UNITY = new Vector(0,1,0);
-    public static final Vector UNITZ = new Vector(0,0,1);
+    public static final Vector ZERO()  {return new Vector(0,0,0);}
+    public static final Vector ONE()   {return new Vector(1,1,1);}
+    public static final Vector UNITX() {return new Vector(1,0,0);}
+    public static final Vector UNITY() {return new Vector(0,1,0);}
+    public static final Vector UNITZ() {return new Vector(0,0,1);}
 
     public double x;
     public double y;
@@ -22,6 +22,12 @@ public class Vector {
         this.x = x;
         this.y = y;
         this.z = z;
+    }
+
+    public Vector(Vector v){
+        this.x = v.x;
+        this.y = v.y;
+        this.z = v.z;
     }
 
     @Override

@@ -18,7 +18,7 @@ public abstract class PhysicsObject {
     //region Constructors
 
     public PhysicsObject(){
-        this(null, new Flags(), 1.0, Vector.ZERO, Vector.ZERO, Vector.ZERO);
+        this(null, new Flags(), 1.0, Vector.ZERO(), Vector.ZERO(), Vector.ZERO());
     }
 
     public PhysicsObject(Mesh collisionMesh, Flags nullForces, double mass, Vector centerOfMass, Vector position, Vector velocity) {
@@ -28,16 +28,12 @@ public abstract class PhysicsObject {
         this.centerOfMass = centerOfMass;
         this.position = position;
         this.velocity = velocity;
-        this.netForce = Vector.ZERO;
+        this.netForce = Vector.ZERO();
     }
 
     //endregion
 
     //region Getters
-
-    public final Vector getPosition() {
-        return position;
-    }
 
     public final Mesh getCollisionMesh() {
         return collisionMesh;
@@ -51,6 +47,14 @@ public abstract class PhysicsObject {
         return centerOfMass;
     }
 
+    public final Vector getPosition() {
+        return position;
+    }
+
+    public final Vector getVelocity() {
+        return velocity;
+    }
+
     public final Flags getNullForces() {
         return nullForces;
     }
@@ -59,24 +63,29 @@ public abstract class PhysicsObject {
 
     //region Setters
 
-    public final void setCollisionMesh(Mesh collisionMesh) {
+    public final PhysicsObject setCollisionMesh(Mesh collisionMesh) {
         this.collisionMesh = collisionMesh;
+        return this;
     }
 
-    public final void setMass(double mass) {
+    public final PhysicsObject setMass(double mass) {
         this.mass = mass;
+        return this;
     }
 
-    public final void setCenterOfMass(Vector centerOfMass) {
+    public final PhysicsObject setCenterOfMass(Vector centerOfMass) {
         this.centerOfMass = centerOfMass;
+        return this;
     }
 
-    public final void setPosition(Vector position) {
+    public final PhysicsObject setPosition(Vector position) {
         this.position = position;
+        return this;
     }
 
-    public final void setVelocity(Vector velocity) {
+    public final PhysicsObject setVelocity(Vector velocity) {
         this.velocity = velocity;
+        return this;
     }
 
     //endregion
@@ -89,5 +98,10 @@ public abstract class PhysicsObject {
 
     public final void applyForce(Vector force) {
         netForce.add(force);
+    }
+
+    public final void applyForce(Force force){
+        if (this.nullForces.getState(force.getClass()))
+            this.applyForce(force.getForceOn(this));
     }
 }
