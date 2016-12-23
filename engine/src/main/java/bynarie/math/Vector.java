@@ -1,11 +1,17 @@
 package bynarie.math;
 
 public class Vector {
-    public static final Vector ZERO()  {return new Vector(0,0,0);}
-    public static final Vector ONE()   {return new Vector(1,1,1);}
-    public static final Vector UNITX() {return new Vector(1,0,0);}
-    public static final Vector UNITY() {return new Vector(0,1,0);}
-    public static final Vector UNITZ() {return new Vector(0,0,1);}
+    public static Vector ZERO()  {return new Vector(0,0,0);}
+    public static Vector ONE()   {return new Vector(1,1,1);}
+    public static Vector UNITX() {return new Vector(1,0,0);}
+    public static Vector UNITY() {return new Vector(0,1,0);}
+    public static Vector UNITZ() {return new Vector(0,0,1);}
+
+    public static final Vector ZERO = Vector.ZERO();
+    public static final Vector ONE = Vector.ONE();
+    public static final Vector UNITX = Vector.UNITX();
+    public static final Vector UNITY = Vector.UNITY();
+    public static final Vector UNITZ = Vector.UNITZ();
 
     public double x;
     public double y;
@@ -13,6 +19,9 @@ public class Vector {
 
     public static Vector add(Vector a, Vector b) {
         return new Vector(a.x + b.x, a.y + b.y, a.z + b.z);
+    }
+    public static Vector sub(Vector a, Vector b) {
+        return new Vector(a.x - b.x, a.y - b.y, a.z - b.z);
     }
     public static Vector mul(Vector v, double c) {
         return new Vector(v.x * c, v.y * c, v.z * c);
@@ -42,6 +51,13 @@ public class Vector {
         return this;
     }
 
+    public Vector sub(Vector b){
+        x -= b.x;
+        y -= b.y;
+        z -= b.z;
+        return this;
+    }
+
     public Vector mul(double c) {
         x *= c;
         y *= c;
@@ -51,6 +67,22 @@ public class Vector {
 
     public Vector nullify(){
         this.mul(0);
+        return this;
+    }
+
+    public double length(){
+        return Math.sqrt(x*x + y*y + z*z);
+    }
+
+    public double length2(){
+        return x*x + y*y + z*z;
+    }
+
+    public Vector normalize(){
+        double len = length();
+        x /= len;
+        y /= len;
+        z /= len;
         return this;
     }
 }

@@ -43,6 +43,7 @@ public class Engine {
         createAndAddForces(forceClasses);
     }
 
+    @SafeVarargs
     public <T extends Force> Engine(Collection<PhysicsObject> objects, Class<T>... forceClasses) {
         this(objects);
         createAndAddForces(forceClasses);
@@ -53,25 +54,28 @@ public class Engine {
             this.objects = new HashSet<>();
         if (this.forces == null)
             this.forces = new HashSet<>();
-        this.cycler = new Cycler(this.objects, this.forces);
+        this.cycler = new Cycler(this);
     }
 
     //endregion
 
     //region Modifiers
 
-    //region Adders
-
-    public final void addForces(Force... forces) {
+    private void addForces(Force... forces) {
+        for (Force f : forces){
+            if (!f.isLinked()){
+                f.link(this);
+            }
+        }
         Collections.addAll(this.forces, forces);
     }
 
-    public final void createAndAddForces() {
+    private void createAndAddForces() {
         //Do nothing (for SafeVarargs)
     }
 
     @SafeVarargs
-    public final <T extends Force> void createAndAddForces(Class<T>... forceClasses) {
+    private final <T extends Force> void createAndAddForces(Class<T>... forceClasses) {
         for (Class<T> c : forceClasses) {
             Force f = null;
             try {
@@ -86,84 +90,119 @@ public class Engine {
                 System.err.printf("Failed to invoke the default constructor of %s, skipping.", c.getName());
             }
             if (f != null)
-                f.setObjects(objects);
+                f.link(this);
             this.forces.add(f);
         }
     }
 
-    //endregion
-
-    //region Removers
-
-    public final void removeForce(Force force) {
-        removeForces(force);
+    public final Engine setObjects(Collection<PhysicsObject> objects) {
+        this.objects = objects;
+        return this;
     }
 
-    public final void removeForces(Force... forces) {
-        for (Force f : forces) this.forces.remove(f);
-    }
-
-    public final void removeForces(Collection<Force> forces) {
-        Iterator<Force> i = forces.iterator();
-        while (i.hasNext()) {
-            this.forces.remove(i.next());
-            i.remove();
-        }
-    }
-
-    public final <T extends Force> void removeForce(Class<T> forceClass) {
-        removeForces(forceClass);
-    }
-
-    @SafeVarargs
-    public final <T extends Force> void removeForces(Class<T>... forceClasses) {
-        for (Class<T> c : forceClasses) {
-            Iterator<Force> i = forces.iterator();
-            while (i.hasNext()) {
-                Force f = i.next();
-                if (f.getClass() == c) {
-                    forces.remove(f);
-                }
-                i.remove();
+    public final Engine setForces(Collection<Force> forces) {
+        this.forces = forces;
+        for (Force f : this.forces){
+            if (!f.isLinked()){
+                f.link(this);
             }
         }
+        return this;
+    }
+
+    public final <T extends Cycler> Engine generateNewCycler(Class<T> cyclerClass){
+        return this.generateNewCycler(cyclerClass, new Class<?>[0]);
+    }
+
+    public final <T extends Cycler> Engine generateNewCycler(Class<T> cyclerClass, Class<?>[] paramTypes, Object... params) {
+        Cycler newCycler = null;
+        try {
+            newCycler = cyclerClass.getConstructor(paramTypes).newInstance(params);
+        } catch (NoSuchMethodException e) {
+            System.err.printf("%s does not have a constructor with those parameter types, doing nothing.", cyclerClass.getName());
+        } catch (IllegalAccessException e) {
+            System.err.printf("Cannot access the constructor with those parameter types for class %s, doing nothing.", cyclerClass.getName());
+        } catch (InstantiationException e) {
+            System.err.printf("Unable to create a new instance of %s, skipping.", cyclerClass.getName());
+        } catch (InvocationTargetException e) {
+            System.err.printf("Failed to invoke the constructor with those parameter types of %s, skipping.", cyclerClass.getName());
+        }
+        if (newCycler != null && !newCycler.isLinked()) {
+            newCycler.link(this);
+            this.cycler = newCycler;
+        }
+        return this;
     }
 
     //endregion
+
+    //region Accessors
+
+    public final Collection<PhysicsObject> getObjects() {
+        return objects;
+    }
+
+    final Collection<Force> getForces() {
+        return forces;
+    }
 
     //endregion
 
     //region Cycler Control
 
-    public void start() {
+    public final void start() {
         cycler.start();
     }
 
-    public void stop() {
+    public final void start(int cyclesPerSecond){
+        cycler.start(cyclesPerSecond);
+    }
+
+    public final void start(int cyclesPerSecond, double cycleRate){
+        cycler.start(cyclesPerSecond,cycleRate);
+    }
+
+    public final void stop() {
         cycler.stop();
     }
 
-    public void begin() {
+    public final void begin() {
         cycler.begin();
     }
 
-    public void pause() {
+    public final void begin(int cyclesPerSecond){
+        cycler.begin(cyclesPerSecond);
+    }
+
+    public final void begin(int cyclesPerSecond, double cycleRate) {
+        cycler.begin(cyclesPerSecond,cycleRate);
+    }
+
+    public final void pause() {
         cycler.pause();
     }
 
-    public void play() {
+    public final void play() {
         cycler.play();
     }
 
-    public void step(double time) {
+    public final void step(double time) {
         cycler.step(time);
     }
 
-    public boolean isRunning() {
+    public final void step(){
+        cycler.step();
+    }
+
+    public final void runNumSteps(int numSteps){
+        cycler.runNumSteps(numSteps);
+    }
+
+    public final boolean isRunning() {
         return cycler.isRunning();
     }
 
-    public boolean isPaused() {
+    public final boolean isPaused() {
         return cycler.isPaused();
     }
 

@@ -2,28 +2,27 @@ package bynarie.testing;
 
 import bynarie.engine.Engine;
 import bynarie.engine.PhysicsObject;
-import bynarie.engine.forces.Gravity;
+import bynarie.engine.forces.NBodyGravity;
 import bynarie.math.Vector;
 
 import java.util.ArrayList;
 
 public class Main {
-    public static void main(String[] args) {
+    public static void main(String[] args) throws InterruptedException {
         ArrayList<PhysicsObject> obs = new ArrayList<>();
-        for (int i=0; i<1000000; i++) {
-            obs.add(new Ball().setPosition(new Vector(0, 0, i)));
-        }
-        Engine e = new Engine(obs, Gravity.class);
-        int steps = 41;
-        e.start();
-        while(obs.get(0).getVelocity().z > -9.7){
-            try {
-                Thread.sleep(0);
-            } catch (InterruptedException e1) {
-                e1.printStackTrace();
-            }
-        }
+        obs.add(new Ball().setPosition(new Vector(0, 0, 0)).setMass(2));
+        obs.add(new Ball().setPosition(new Vector(1, 1, 0)).setMass(1));
+        obs.add(new Ball().setPosition(new Vector(0, 1, 0)).setMass(1.5));
+        System.out.println("Generated!");
+        Engine e = new Engine(obs, new NBodyGravity(5, 0.2));
+        int cps = 1000;
+        int secs = 30;
+        e.begin(cps, 0);
+        e.runNumSteps(cps*secs);
         e.stop();
-        System.out.println(obs.get(0).getPosition().z + " " + obs.get(0).getVelocity().z);
+        System.out.println();
+        for (PhysicsObject po : obs) {
+            System.out.println(po.getPosition() + " " + po.getVelocity());
+        }
     }
 }
