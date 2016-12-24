@@ -21,17 +21,17 @@ public class RenderablePhysicsObject implements Renderable {
         }
 
         return new double[]{
-                p.x() + b.x(), p.y() + b.y(), p.z() + b.z(),
-                p.x() + b.x(), p.y() + b.y(), p.z() - b.z(),
+                p.x + b.x, p.y + b.y, p.z + b.z,
+                p.x + b.x, p.y + b.y, p.z - b.z,
 
-                p.x() + b.x(), p.y() - b.y(), p.z() + b.z(),
-                p.x() + b.x(), p.y() - b.y(), p.z() - b.z(),
+                p.x + b.x, p.y - b.y, p.z + b.z,
+                p.x + b.x, p.y - b.y, p.z - b.z,
 
-                p.x() - b.x(), p.y() + b.y(), p.z() + b.z(),
-                p.x() - b.x(), p.y() + b.y(), p.z() - b.z(),
+                p.x - b.x, p.y + b.y, p.z + b.z,
+                p.x - b.x, p.y + b.y, p.z - b.z,
 
-                p.x() - b.x(), p.y() - b.y(), p.z() + b.z(),
-                p.x() - b.x(), p.y() - b.y(), p.z() - b.z(),
+                p.x - b.x, p.y - b.y, p.z + b.z,
+                p.x - b.x, p.y - b.y, p.z - b.z,
         };
     }
 
