@@ -1,4 +1,4 @@
-package bynarie.testing;
+package bynarie.renderer.testing;
 
 import bynarie.engine.PhysicsObject;
 

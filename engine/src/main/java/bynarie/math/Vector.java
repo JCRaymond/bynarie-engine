@@ -7,12 +7,6 @@ public class Vector {
     public static Vector UNITY() {return new Vector(0,1,0);}
     public static Vector UNITZ() {return new Vector(0,0,1);}
 
-    public static final Vector ZERO = Vector.ZERO();
-    public static final Vector ONE = Vector.ONE();
-    public static final Vector UNITX = Vector.UNITX();
-    public static final Vector UNITY = Vector.UNITY();
-    public static final Vector UNITZ = Vector.UNITZ();
-
     public double x;
     public double y;
     public double z;
