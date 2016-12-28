@@ -54,7 +54,7 @@ public class Main {
         }
 
         Engine e = new Engine(obs, new NBodyGravity(2, 0.01));
-//        Engine e = new Engine(obs, new NBodyGravity(5, 0.01));
+//        OldEngine e = new OldEngine(obs, new NBodyGravity(5, 0.01));
         RenderWindow rw = new RenderWindow(e, 1280, 720);
 
         rw.start(10000, 1);

@@ -70,7 +70,7 @@ public class RenderWindow {
         glfwWindowHint(GLFW_VISIBLE, GLFW_FALSE);
         glfwWindowHint(GLFW_RESIZABLE, GLFW_TRUE);
 
-        window = glfwCreateWindow(width, height, "Bynarie Engine", NULL, NULL);
+        window = glfwCreateWindow(width, height, "Bynarie OldEngine", NULL, NULL);
         if (window == NULL)
             throw new RuntimeException("Failed to create the GLFW window");
 

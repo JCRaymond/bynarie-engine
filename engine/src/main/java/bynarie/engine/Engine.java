@@ -1,6 +1,7 @@
 package bynarie.engine;
 
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashSet;
 
 public class Engine {
@@ -32,6 +33,11 @@ public class Engine {
     public Engine(Collection<PhysicsObject> objects, Collection<Force> forces){
         this(objects);
         this.forces = forces;
+    }
+
+    public Engine(Collection<PhysicsObject> objects, Force... forces){
+        this(objects);
+        Collections.addAll(this.forces, forces);
     }
 
     public Collection<PhysicsObject> getObjects(){

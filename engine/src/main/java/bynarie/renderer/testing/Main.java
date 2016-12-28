@@ -15,7 +15,7 @@ public class Main {
         obs.add(new Ball().setPosition(new Vector(0, 1, 0)).setMass(1));
         System.out.println("Generated!");
         Engine e = new Engine(obs, new NBodyGravity(5, 0.2));
-        int cps = 10001;
+        int cps = 10000;
         int secs = 30;
         e.begin(cps, 0);
         e.runNumSteps(cps*secs);
