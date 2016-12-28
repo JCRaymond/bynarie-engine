@@ -10,12 +10,12 @@ import java.util.ArrayList;
 public class Main {
     public static void main(String[] args) throws InterruptedException {
         ArrayList<PhysicsObject> obs = new ArrayList<>();
-        obs.add(new Ball().setPosition(new Vector(0, 0, 0)).setMass(2));
+        obs.add(new Ball().setPosition(new Vector(0, 0, 0)).setMass(1));
         obs.add(new Ball().setPosition(new Vector(1, 1, 0)).setMass(1));
-        obs.add(new Ball().setPosition(new Vector(0, 1, 0)).setMass(1.5));
+        obs.add(new Ball().setPosition(new Vector(0, 1, 0)).setMass(1));
         System.out.println("Generated!");
         Engine e = new Engine(obs, new NBodyGravity(5, 0.2));
-        int cps = 1000;
+        int cps = 10001;
         int secs = 30;
         e.begin(cps, 0);
         e.runNumSteps(cps*secs);

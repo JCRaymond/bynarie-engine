@@ -53,7 +53,6 @@ public class Cycler {
     private void cycle(){
         long startTime = System.nanoTime(), endTime;
         long cycleStart;
-        double cycleTime;
         while (running){
             while(this.paused && !this.step){
                 try {
@@ -62,13 +61,12 @@ public class Cycler {
             }
             cycleStart = System.nanoTime();
 
-            for (PhysicsObject po : this.getObjects()){
-                doCycle(po);
-            }
+            this.getObjects().parallelStream().forEach(this::doCycle);
 
             endTime = startTime;
             startTime = System.nanoTime();
 
+            final double cycleTime;
             if (this.step){
                 cycleTime = this.steptime;
             }
@@ -79,9 +77,7 @@ public class Cycler {
                 cycleTime = (endTime - startTime)/1000000000.;
             }
 
-            for (PhysicsObject po : this.getObjects()){
-                po.stepPosition(cycleTime);
-            }
+            this.getObjects().parallelStream().forEach(po -> po.stepPosition(cycleTime));
 
             try {
                 Thread.sleep(0);
@@ -130,6 +126,7 @@ public class Cycler {
         }
         this.running = false;
         this.step = true;
+        this.paused = false;
         try {
             t.join();
         } catch (InterruptedException e) {

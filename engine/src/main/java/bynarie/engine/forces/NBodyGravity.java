@@ -14,7 +14,7 @@ public class NBodyGravity extends Force{
         Vector t;
         double len2;
         for (PhysicsObject other : this.getObjects()){
-            if (po != other) {
+            if (po != other && other.getNullForces().getState(this.getClass())) {
                 t = Vector.sub(other.getPosition(), po.getPosition());
                 len2 = t.length2();
                 f.add(t.normalize().mul((G*po.getMass()*other.getMass())/(len2+damp)));

@@ -42,10 +42,10 @@ public class RenderWindow {
         start(60);
     }
 
-    public void start(int cyclesPerSecond) {
+    public void start(int cyclesPerSecond, double cycleRate) {
         try {
             init();
-            engine.start(cyclesPerSecond);
+            engine.start(cyclesPerSecond, cycleRate);
             loop();
             engine.stop();
 
@@ -55,6 +55,10 @@ public class RenderWindow {
             glfwTerminate();
             glfwSetErrorCallback(null).free();
         }
+    }
+
+    public void start(int cyclesPerSecond){
+        this.start(cyclesPerSecond, 1);
     }
 
     private void init() {
