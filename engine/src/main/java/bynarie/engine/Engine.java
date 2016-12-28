@@ -1,211 +1,206 @@
 package bynarie.engine;
 
-import java.lang.reflect.InvocationTargetException;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.HashSet;
-import java.util.Iterator;
 
 public class Engine {
     private Collection<PhysicsObject> objects;
     private Collection<Force> forces;
-    private Cycler cycler;
 
-    //region Constructors
+    private Thread t;
+    private boolean running;
+    private boolean paused;
+    private boolean step;
+    private double steptime;
 
     public Engine() {
-        initialize();
+        this.objects = new HashSet<>();
+        this.forces = new HashSet<>();
+
+        this.t = Thread.currentThread();
+        this.running = false;
+        this.paused = false;
+        this.step = false;
+        this.steptime = 1000;
     }
 
-    public Engine(Collection<PhysicsObject> objects) {
+    public Engine(Collection<PhysicsObject> objects){
+        this();
         this.objects = objects;
-        initialize();
     }
 
-    public Engine(Collection<PhysicsObject> objects, Collection<Force> forces) {
-        this.objects = objects;
+    public Engine(Collection<PhysicsObject> objects, Collection<Force> forces){
+        this(objects);
         this.forces = forces;
-        initialize();
     }
 
-    public Engine(Force... forces) {
-        this();
-        addForces(forces);
+    public Collection<PhysicsObject> getObjects(){
+        return this.objects;
     }
 
-    public Engine(Collection<PhysicsObject> objects, Force... forces) {
-        this(objects);
-        addForces(forces);
+    public Collection<Force> getForces(){
+        return this.forces;
     }
 
-    public <T extends Force> Engine(Class<T>... forceClasses) {
-        this();
-        createAndAddForces(forceClasses);
-    }
-
-    @SafeVarargs
-    public <T extends Force> Engine(Collection<PhysicsObject> objects, Class<T>... forceClasses) {
-        this(objects);
-        createAndAddForces(forceClasses);
-    }
-
-    private void initialize() {
-        if (this.objects == null)
-            this.objects = new HashSet<>();
-        if (this.forces == null)
-            this.forces = new HashSet<>();
-        this.cycler = new Cycler(this);
-    }
-
-    //endregion
-
-    //region Modifiers
-
-    private void addForces(Force... forces) {
-        for (Force f : forces){
-            if (!f.isLinked()){
-                f.link(this);
-            }
+    public final Engine setObjects(Collection<PhysicsObject> objects){
+        if (this.running){
+            System.err.println("You can not set the objects while the Engine is running!");
+            return this;
         }
-        Collections.addAll(this.forces, forces);
+        this.objects = objects;
+        return this;
     }
 
-    private void createAndAddForces() {
-        //Do nothing (for SafeVarargs)
+    public final Engine setForces(Collection<Force> forces){
+        if (this.running){
+            System.err.println("You can not set the forces while the Engine is running!");
+            return this;
+        }
+        this.forces = forces;
+        return this;
     }
 
-    @SafeVarargs
-    private final <T extends Force> void createAndAddForces(Class<T>... forceClasses) {
-        for (Class<T> c : forceClasses) {
-            Force f = null;
+    private void cycle(double cyclePeriod, double cycleLength){
+        long cycleStart;
+        while (running){
+            while(this.paused && !this.step){
+                try {
+                    Thread.sleep(0);
+                } catch (InterruptedException e) {}
+            }
+            cycleStart = System.nanoTime();
+
+            for (Force f : this.forces){
+                f.applyForceOn(this.objects);
+            }
+
+            final double cycleTime;
+            if (this.step && this.steptime > 0){
+                cycleTime = this.steptime;
+            }
+            else {
+                cycleTime = cyclePeriod;
+            }
+
+            this.objects.parallelStream().forEach(po -> po.stepPosition(cycleTime));
+
             try {
-                f = c.getConstructor().newInstance();
-            } catch (NoSuchMethodException e) {
-                System.err.printf("%s does not have a default constructor, skipping.", c.getName());
-            } catch (IllegalAccessException e) {
-                System.err.printf("Cannot access the default constructor for class %s, skipping.", c.getName());
-            } catch (InstantiationException e) {
-                System.err.printf("Unable to create a new instance of %s, skipping.", c.getName());
-            } catch (InvocationTargetException e) {
-                System.err.printf("Failed to invoke the default constructor of %s, skipping.", c.getName());
-            }
-            if (f != null)
-                f.link(this);
-            this.forces.add(f);
+                Thread.sleep(0);
+            } catch (InterruptedException e) {}
+
+            this.step = false;
+
+            while ((System.nanoTime()-cycleStart)/1000000000. < cycleLength){}
         }
     }
 
-    public final Engine setObjects(Collection<PhysicsObject> objects) {
-        this.objects = objects;
-        return this;
-    }
-
-    public final Engine setForces(Collection<Force> forces) {
-        this.forces = forces;
-        for (Force f : this.forces){
-            if (!f.isLinked()){
-                f.link(this);
-            }
+    public final void start(int cyclesPerSimSecond, double simRate) {
+        if (this.running) {
+            System.err.println("The Engine is already running!");
+            return;
         }
-        return this;
+        this.running = true;
+        final double cyclePeriod = cyclesPerSimSecond>0 ? 1./cyclesPerSimSecond : 0;
+        final double cycleLength = simRate > 0 ? cyclePeriod/simRate : 0;
+        t = new Thread(() -> this.cycle(cyclePeriod, cycleLength));
+        t.start();
     }
 
-    public final <T extends Cycler> Engine generateNewCycler(Class<T> cyclerClass){
-        return this.generateNewCycler(cyclerClass, new Class<?>[0]);
+    public final void start(int cyclesPerSimSecond) {
+        start(cyclesPerSimSecond, 1);
     }
 
-    public final <T extends Cycler> Engine generateNewCycler(Class<T> cyclerClass, Class<?>[] paramTypes, Object... params) {
-        Cycler newCycler = null;
-        try {
-            newCycler = cyclerClass.getConstructor(paramTypes).newInstance(params);
-        } catch (NoSuchMethodException e) {
-            System.err.printf("%s does not have a constructor with those parameter types, doing nothing.", cyclerClass.getName());
-        } catch (IllegalAccessException e) {
-            System.err.printf("Cannot access the constructor with those parameter types for class %s, doing nothing.", cyclerClass.getName());
-        } catch (InstantiationException e) {
-            System.err.printf("Unable to create a new instance of %s, skipping.", cyclerClass.getName());
-        } catch (InvocationTargetException e) {
-            System.err.printf("Failed to invoke the constructor with those parameter types of %s, skipping.", cyclerClass.getName());
-        }
-        if (newCycler != null && !newCycler.isLinked()) {
-            newCycler.link(this);
-            this.cycler = newCycler;
-        }
-        return this;
-    }
-
-    //endregion
-
-    //region Accessors
-
-    public final Collection<PhysicsObject> getObjects() {
-        return objects;
-    }
-
-    final Collection<Force> getForces() {
-        return forces;
-    }
-
-    //endregion
-
-    //region Cycler Control
-
-    public final void start() {
-        cycler.start();
-    }
-
-    public final void start(int cyclesPerSecond){
-        cycler.start(cyclesPerSecond);
-    }
-
-    public final void start(int cyclesPerSecond, double cycleRate){
-        cycler.start(cyclesPerSecond,cycleRate);
+    public final void start(){
+        start(0);
     }
 
     public final void stop() {
-        cycler.stop();
+        if (!this.running) {
+            System.err.println("The Engine is not running!");
+            return;
+        }
+        this.running = false;
+        this.step = true;
+        this.paused = false;
+        try {
+            t.join();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
     }
 
-    public final void begin() {
-        cycler.begin();
+    public final void begin(int cyclesPerSimSecond, double simRate) {
+        if (this.running) {
+            System.err.println("The Engine is already running!");
+            return;
+        }
+        this.paused = true;
+        this.start(cyclesPerSimSecond, simRate);
     }
 
-    public final void begin(int cyclesPerSecond){
-        cycler.begin(cyclesPerSecond);
+    public final void begin(int cyclesPerSimSecond){
+        begin(cyclesPerSimSecond, 1);
     }
 
-    public final void begin(int cyclesPerSecond, double cycleRate) {
-        cycler.begin(cyclesPerSecond,cycleRate);
+    public final void begin(){
+        begin(0);
     }
 
     public final void pause() {
-        cycler.pause();
+        if (!this.running){
+            System.err.println("The Engine is not running!");
+            return;
+        }
+        this.paused = true;
     }
 
     public final void play() {
-        cycler.play();
+        if (!this.running){
+            System.err.println("The Engine is not running!");
+            return;
+        }
+        if (!this.paused){
+            System.err.println("The Engine is not paused!");
+            return;
+        }
+        this.paused = false;
     }
 
-    public final void step(double time) {
-        cycler.step(time);
+    public final void step(double cyclePeriod) {
+        if (!this.running){
+            System.err.println("The Engine is not running!");
+            return;
+        }
+        if (!this.paused) {
+            System.err.println("The Engine is not paused!");
+            return;
+        }
+        this.step = true;
+        this.steptime = cyclePeriod;
+        while (this.step) {
+            try {
+                Thread.sleep(0);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
     }
 
     public final void step(){
-        cycler.step();
+        step(0);
     }
 
     public final void runNumSteps(int numSteps){
-        cycler.runNumSteps(numSteps);
+        for (int i=0; i<numSteps; i++){
+            this.step();
+        }
     }
 
     public final boolean isRunning() {
-        return cycler.isRunning();
+        return this.running;
     }
 
     public final boolean isPaused() {
-        return cycler.isPaused();
+        return this.paused;
     }
-
-    //endregion
-
 }

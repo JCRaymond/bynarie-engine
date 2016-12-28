@@ -4,8 +4,6 @@ import bynarie.math.Vector;
 
 public abstract class PhysicsObject {
 
-    protected Mesh collisionMesh;
-
     protected Flags nullForces;
 
     protected double mass;
@@ -18,11 +16,10 @@ public abstract class PhysicsObject {
     //region Constructors
 
     public PhysicsObject(){
-        this(null, new Flags(), 1.0, Vector.ZERO(), Vector.ZERO(), Vector.ZERO());
+        this(new Flags(), 1.0, Vector.ZERO(), Vector.ZERO(), Vector.ZERO());
     }
 
-    public PhysicsObject(Mesh collisionMesh, Flags nullForces, double mass, Vector centerOfMass, Vector position, Vector velocity) {
-        this.collisionMesh = collisionMesh;
+    public PhysicsObject(Flags nullForces, double mass, Vector centerOfMass, Vector position, Vector velocity) {
         this.nullForces = nullForces;
         this.mass = mass;
         this.centerOfMass = centerOfMass;
@@ -34,10 +31,6 @@ public abstract class PhysicsObject {
     //endregion
 
     //region Getters
-
-    public final Mesh getCollisionMesh() {
-        return collisionMesh;
-    }
 
     public final double getMass() {
         return mass;
@@ -62,11 +55,6 @@ public abstract class PhysicsObject {
     //endregion
 
     //region Setters
-
-    public final PhysicsObject setCollisionMesh(Mesh collisionMesh) {
-        this.collisionMesh = collisionMesh;
-        return this;
-    }
 
     public final PhysicsObject setMass(double mass) {
         this.mass = mass;
@@ -100,8 +88,4 @@ public abstract class PhysicsObject {
         netForce.add(force);
     }
 
-    public final void applyForce(Force force){
-        if (this.nullForces.getState(force.getClass()))
-            this.applyForce(force.getForceOn(this));
-    }
 }

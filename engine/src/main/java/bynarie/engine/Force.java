@@ -5,26 +5,20 @@ import bynarie.math.Vector;
 import java.util.Collection;
 
 public abstract class Force {
-    private Engine engine;
-    private boolean linked;
+    private Collection<PhysicsObject> objects;
 
-    public Force(){
-        this.linked = false;
+    public final Collection<PhysicsObject> getObjects(){
+        return this.objects;
     }
 
-    final void link(Engine e) {
-        this.engine = e;
-        this.linked = true;
+    final void applyForceOn(Collection<PhysicsObject> objects){
+        this.objects = objects;
+        this.objects.parallelStream().forEach(this::applyForceOn);
     }
 
-    protected final Collection<PhysicsObject> getObjects(){
-        if (this.linked)
-            return this.engine.getObjects();
-        return null;
-    }
-
-    public final boolean isLinked(){
-        return this.linked;
+    private void applyForceOn(PhysicsObject po){
+        if (po.getNullForces().getState(this.getClass()))
+            po.applyForce(this.getForceOn(po));
     }
 
     public abstract Vector getForceOn(PhysicsObject po);
