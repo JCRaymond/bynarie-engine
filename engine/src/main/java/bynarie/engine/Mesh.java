@@ -11,7 +11,7 @@ public class Mesh {
     }
 
     public Mesh() {
-        this(Vector.ONE().mul(0.5));
+        this(Vector.one().mul(0.5));
     }
 
     public Mesh(Vector bounds) {

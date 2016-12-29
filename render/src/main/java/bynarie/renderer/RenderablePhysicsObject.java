@@ -16,9 +16,6 @@ public class RenderablePhysicsObject implements Renderable {
     public double[] getVertexData() {
         Vector p = object.getPosition();
         Vector b = new Vector(0.01, 0.01, 0.01);
-        if (object.getCollisionMesh() != null) {
-            b = object.getCollisionMesh().getBounds();
-        }
 
         return new double[]{
                 p.x + b.x, p.y + b.y, p.z + b.z,

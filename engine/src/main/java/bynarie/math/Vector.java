@@ -1,30 +1,54 @@
 package bynarie.math;
 
 public class Vector {
-    public static Vector ZERO()  {return new Vector(0,0,0);}
-    public static Vector ONE()   {return new Vector(1,1,1);}
-    public static Vector UNITX() {return new Vector(1,0,0);}
-    public static Vector UNITY() {return new Vector(0,1,0);}
-    public static Vector UNITZ() {return new Vector(0,0,1);}
+    //region Vector Units
+    public static Vector zero() {
+        return new Vector();
+    }
 
-    public static final Vector ZERO = Vector.ZERO();
-    public static final Vector ONE = Vector.ONE();
-    public static final Vector UNITX = Vector.UNITX();
-    public static final Vector UNITY = Vector.UNITY();
-    public static final Vector UNITZ = Vector.UNITZ();
+    public static Vector zero(Vector v) {
+        return v.set(0, 0, 0);
+    }
+
+    public static Vector one() {
+        return new Vector().set(1, 1, 1);
+    }
+
+    public static Vector one(Vector v) {
+        return v.set(1, 1, 1);
+    }
+
+    public static Vector unitx() {
+        return new Vector().set(1, 0, 0);
+    }
+
+    public static Vector unitx(Vector v) {
+        return v.set(1, 0, 0);
+    }
+
+    public static Vector unity() {
+        return new Vector().set(0, 1, 0);
+    }
+
+    public static Vector unity(Vector v) {
+        return v.set(0, 1, 0);
+    }
+
+    public static Vector unitz() {
+        return new Vector().set(0, 0, 1);
+    }
+
+    public static Vector unitz(Vector v) {
+        return v.set(0, 0, 1);
+    }
+    //endregion
 
     public double x;
     public double y;
     public double z;
 
-    public static Vector add(Vector a, Vector b) {
-        return new Vector(a.x + b.x, a.y + b.y, a.z + b.z);
-    }
-    public static Vector sub(Vector a, Vector b) {
-        return new Vector(a.x - b.x, a.y - b.y, a.z - b.z);
-    }
-    public static Vector mul(Vector v, double c) {
-        return new Vector(v.x * c, v.y * c, v.z * c);
+    //region Constructors
+    public Vector() {
     }
 
     public Vector(double x, double y, double z) {
@@ -33,57 +57,113 @@ public class Vector {
         this.z = z;
     }
 
-    public Vector(Vector v){
-        this.x = v.x;
-        this.y = v.y;
-        this.z = v.z;
+    public Vector(Vector v) {
+        x = v.x;
+        y = v.y;
+        z = v.z;
+    }
+    //endregion
+
+    //region Mutators
+    public double getX() {
+        return x;
+    }
+
+    public void setX(double x) {
+        this.x = x;
+    }
+
+    public double getY() {
+        return y;
+    }
+
+    public void setY(double y) {
+        this.y = y;
+    }
+
+    public double getZ() {
+        return z;
+    }
+
+    public void setZ(double z) {
+        this.z = z;
+    }
+
+    public Vector set(double x, double y, double z) {
+        this.x = x;
+        this.y = y;
+        this.z = z;
+        return this;
+    }
+    //endregion
+
+    //region Operations
+    public Vector add(Vector v) {
+        return set(x + v.x, y + v.y, z + v.z);
+    }
+
+    public Vector sub(Vector v) {
+        return set(x - v.x, y - v.y, z - v.z);
+    }
+
+    public Vector mul(Vector v) {
+        return set(x * v.x, y * v.y, z * v.z);
+    }
+
+    public Vector div(Vector v) {
+        return set(x / v.x, y / v.y, z / v.z);
+    }
+
+    public Vector add(double c) {
+        return set(x + c, y + c, z + c);
+    }
+
+    public Vector sub(double c) {
+        return set(x - c, y - c, z - c);
+    }
+
+    public Vector mul(double c) {
+        return set(x * c, y * c, z * c);
+    }
+
+    public Vector div(double c) {
+        return set(x / c, y / c, z / c);
+    }
+
+    public Vector normalize() {
+        return div(length());
+    }
+    //endregion
+
+    public double length() {
+        return Math.sqrt(length2());
+    }
+
+    public double length2() {
+        return x * x + y * y + z * z;
+    }
+
+    public Vector copy() {
+        return new Vector(x, y, z);
+    }
+
+    public Vector copy(Vector v) {
+        return v.set(this.x, this.y, this.z);
+    }
+
+    public void copy(double[] arr) {
+        copy(arr, 0);
+    }
+
+    public void copy(double[] arr, int index) {
+        arr[index] = x;
+        arr[index + 1] = y;
+        arr[index + 2] = z;
     }
 
     @Override
     public String toString() {
-        return String.format("<%.2f,%.2f,%.2f>", x, y, z);
-    }
-
-    public Vector add(Vector b) {
-        x += b.x;
-        y += b.y;
-        z += b.z;
-        return this;
-    }
-
-    public Vector sub(Vector b){
-        x -= b.x;
-        y -= b.y;
-        z -= b.z;
-        return this;
-    }
-
-    public Vector mul(double c) {
-        x *= c;
-        y *= c;
-        z *= c;
-        return this;
-    }
-
-    public Vector nullify(){
-        this.mul(0);
-        return this;
-    }
-
-    public double length(){
-        return Math.sqrt(x*x + y*y + z*z);
-    }
-
-    public double length2(){
-        return x*x + y*y + z*z;
-    }
-
-    public Vector normalize(){
-        double len = length();
-        x /= len;
-        y /= len;
-        z /= len;
-        return this;
+        return String.format("<%.2f, %.2f, %.2f>", x, y, z);
     }
 }
 

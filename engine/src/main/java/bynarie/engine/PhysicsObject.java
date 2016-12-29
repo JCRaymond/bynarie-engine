@@ -3,7 +3,6 @@ package bynarie.engine;
 import bynarie.math.Vector;
 
 public abstract class PhysicsObject {
-
     protected Flags nullForces;
 
     protected double mass;
@@ -15,8 +14,8 @@ public abstract class PhysicsObject {
 
     //region Constructors
 
-    public PhysicsObject(){
-        this(new Flags(), 1.0, Vector.ZERO(), Vector.ZERO(), Vector.ZERO());
+    public PhysicsObject() {
+        this(new Flags(), 1.0, Vector.zero(), Vector.zero(), Vector.zero());
     }
 
     public PhysicsObject(Flags nullForces, double mass, Vector centerOfMass, Vector position, Vector velocity) {
@@ -25,7 +24,7 @@ public abstract class PhysicsObject {
         this.centerOfMass = centerOfMass;
         this.position = position;
         this.velocity = velocity;
-        this.netForce = Vector.ZERO();
+        this.netForce = Vector.zero();
     }
 
     //endregion
@@ -79,13 +78,17 @@ public abstract class PhysicsObject {
     //endregion
 
     final void stepPosition(double time) {
-        velocity.add(Vector.mul(netForce, time / mass));
-        position.add(Vector.mul(velocity, time));
-        netForce.nullify();
+        velocity.add(netForce.copy().mul(time / mass));
+        position.add(velocity.copy().mul(time));
+        Vector.zero(netForce);
     }
 
     public final void applyForce(Vector force) {
         netForce.add(force);
     }
 
+    public final void applyForce(Force force) {
+        if (this.nullForces.getState(force.getClass()))
+            this.applyForce(force.getForceOn(this));
+    }
 }
