@@ -87,8 +87,4 @@ public abstract class PhysicsObject {
         netForce.add(force);
     }
 
-    public final void applyForce(Force force) {
-        if (this.nullForces.getState(force.getClass()))
-            this.applyForce(force.getForceOn(this));
-    }
 }

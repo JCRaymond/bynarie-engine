@@ -10,13 +10,15 @@ import static org.lwjgl.opengl.GL11.GL_LINE_LOOP;
 
 public class Body extends PhysicsObject implements Renderable{
     private Vector p;
-    private static int numPoints = 15;
+    private double[] color;
+    private static int numPoints = 19;
 
     public Body(double mass, Vector pos, Vector vel){
         super();
         setMass(mass);
         setPosition(pos);
         setVelocity(vel);
+        this.color = new double[]{1.0, 1.0, 1.0};
     }
 
     public Body(Vector pos, Vector vel){
@@ -29,6 +31,11 @@ public class Body extends PhysicsObject implements Renderable{
 
     public Body(Vector pos){
         this(1, pos, Vector.zero());
+    }
+
+    public Body setColor(double[] color){
+        this.color = color;
+        return this;
     }
 
     @Override
@@ -97,5 +104,10 @@ public class Body extends PhysicsObject implements Renderable{
     @Override
     public int getPrimitive() {
         return GL_LINE_LOOP;
+    }
+
+    @Override
+    public double[] getColor() {
+        return color;
     }
 }

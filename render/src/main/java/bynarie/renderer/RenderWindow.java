@@ -121,8 +121,9 @@ public class RenderWindow {
                 double[] vertices = item.getVertexData();
                 int primitive = item.getPrimitive();
                 int stride = item.getStride();
+                double[] color = item.getColor();
 //                int stride = 3;
-
+                glColor3dv(color);
                 glBegin(primitive);
                 for (int i : indices) {
                     for (int j = 0; j < stride; j++) {

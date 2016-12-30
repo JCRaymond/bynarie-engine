@@ -5,4 +5,5 @@ public interface Renderable {
     int[] getIndices();
     int getStride();
     int getPrimitive();
+    double[] getColor();
 }
