@@ -13,7 +13,9 @@ public abstract class Force {
 
     final void applyForceOn(Collection<PhysicsObject> objects){
         this.objects = objects;
-        this.objects.parallelStream().forEach(this::applyForceOn);
+        this.preForce();
+        this.objects.stream().forEach(this::applyForceOn);
+        this.postForce();
     }
 
     private void applyForceOn(PhysicsObject po){
@@ -21,6 +23,8 @@ public abstract class Force {
             po.applyForce(this.getForceOn(po));
     }
 
+    protected void preForce(){}
     public abstract Vector getForceOn(PhysicsObject po);
+    protected void postForce(){}
 }
 

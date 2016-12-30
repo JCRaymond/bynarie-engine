@@ -1,4 +1,4 @@
-package bynarie.renderer.testing;
+package bynarie.engine.testing;
 
 import bynarie.engine.Engine;
 import bynarie.engine.PhysicsObject;
@@ -10,9 +10,9 @@ import java.util.ArrayList;
 public class Main {
     public static void main(String[] args) throws InterruptedException {
         ArrayList<PhysicsObject> obs = new ArrayList<>();
-        obs.add(new Ball().setPosition(new Vector(0, 0, 0)).setMass(1));
-        obs.add(new Ball().setPosition(new Vector(1, 1, 0)).setMass(1));
-        obs.add(new Ball().setPosition(new Vector(0, 1, 0)).setMass(1));
+        //obs.add(new Body(new Vector(0, 0, 0)).setMass(1));
+        //obs.add(new Body(new Vector(1, 1, 0)).setMass(1));
+        //obs.add(new Body(new Vector(0, 1, 0)).setMass(1));
         System.out.println("Generated!");
         Engine e = new Engine(obs, new NBodyGravity(5, 0.2));
         int cps = 10000;

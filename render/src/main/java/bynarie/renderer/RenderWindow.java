@@ -9,6 +9,8 @@ import org.lwjgl.opengl.GL;
 
 import java.nio.IntBuffer;
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Iterator;
 
 import static org.lwjgl.glfw.Callbacks.glfwFreeCallbacks;
 import static org.lwjgl.glfw.GLFW.*;
@@ -21,7 +23,7 @@ public class RenderWindow {
     private int height;
     private float viewScale = 10;
 
-    private Iterable<Renderable> items;
+    private Collection<Renderable> items;
     private Engine engine;
 
     public RenderWindow(Engine engine) {
@@ -29,13 +31,21 @@ public class RenderWindow {
     }
 
     public RenderWindow(Engine engine, int width, int height) {
-        ArrayList<Renderable> objs = new ArrayList<>();
-        for (PhysicsObject po : engine.getObjects()) objs.add(new RenderablePhysicsObject(po));
-
-        this.items = objs;
+        this.items = new ArrayList<>();
         this.engine = engine;
         this.width = width;
         this.height = height;
+    }
+
+    public void updateRenderableObjects(){
+        this.items.clear();
+        Iterator<PhysicsObject> i = this.engine.getObjects().iterator();
+        while(i.hasNext()){
+            PhysicsObject po = i.next();
+            if (Renderable.class.isAssignableFrom(po.getClass())){
+                items.add((Renderable)po);
+            }
+        }
     }
 
     public void start() {
@@ -104,6 +114,7 @@ public class RenderWindow {
         glClearColor(.1f, .1f, .1f, 1f);
 
         while (!glfwWindowShouldClose(window)) {
+            updateRenderableObjects();
             glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
             IntBuffer w = BufferUtils.createIntBuffer(1);

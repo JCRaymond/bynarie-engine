@@ -1,21 +1,39 @@
-package bynarie.renderer;
+package bynarie.renderer.testing;
 
 import bynarie.engine.PhysicsObject;
 import bynarie.math.Vector;
+import bynarie.renderer.Renderable;
 
 import static org.lwjgl.opengl.GL11.GL_LINES;
 
-public class RenderablePhysicsObject implements Renderable {
-    private final PhysicsObject object;
+public class Body extends PhysicsObject implements Renderable{
+    private Vector b;
+    private Vector p;
 
-    public RenderablePhysicsObject(PhysicsObject object) {
-        this.object = object;
+    public Body(double mass, Vector pos, Vector vel){
+        super();
+        setMass(mass);
+        setPosition(pos);
+        setVelocity(vel);
+        this.b = new Vector();
+    }
+
+    public Body(Vector pos, Vector vel){
+        this(1, pos, vel);
+    }
+
+    public Body(double mass, Vector pos){
+        this(mass, pos, Vector.zero());
+    }
+
+    public Body(Vector pos){
+        this(1, pos, Vector.zero());
     }
 
     @Override
     public double[] getVertexData() {
-        Vector p = object.getPosition();
-        Vector b = new Vector(0.01, 0.01, 0.01);
+        p = this.getPosition();
+        b = b.set(0.01,0.01,0.01).mul(Math.sqrt(this.getMass()));
 
         return new double[]{
                 p.x + b.x, p.y + b.y, p.z + b.z,
@@ -40,8 +58,7 @@ public class RenderablePhysicsObject implements Renderable {
                 0, 2, 1, 3, 4, 6, 5, 7,
 
                 0, 4, 1, 5, 2, 6, 3, 7,
-        };
-    }
+        };    }
 
     @Override
     public int getStride() {
