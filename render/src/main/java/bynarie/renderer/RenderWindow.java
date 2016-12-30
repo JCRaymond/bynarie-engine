@@ -8,9 +8,8 @@ import org.lwjgl.glfw.GLFWVidMode;
 import org.lwjgl.opengl.GL;
 
 import java.nio.IntBuffer;
-import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Iterator;
+import java.util.Collections;
 
 import static org.lwjgl.glfw.Callbacks.glfwFreeCallbacks;
 import static org.lwjgl.glfw.GLFW.*;
@@ -31,21 +30,9 @@ public class RenderWindow {
     }
 
     public RenderWindow(Engine engine, int width, int height) {
-        this.items = new ArrayList<>();
         this.engine = engine;
         this.width = width;
         this.height = height;
-    }
-
-    public void updateRenderableObjects(){
-        this.items.clear();
-        Iterator<PhysicsObject> i = this.engine.getObjects().iterator();
-        while(i.hasNext()){
-            PhysicsObject po = i.next();
-            if (Renderable.class.isAssignableFrom(po.getClass())){
-                items.add((Renderable)po);
-            }
-        }
     }
 
     public void start() {
@@ -80,7 +67,7 @@ public class RenderWindow {
         glfwWindowHint(GLFW_VISIBLE, GLFW_FALSE);
         glfwWindowHint(GLFW_RESIZABLE, GLFW_TRUE);
 
-        window = glfwCreateWindow(width, height, "Bynarie OldEngine", NULL, NULL);
+        window = glfwCreateWindow(width, height, "Bynarie Engine", NULL, NULL);
         if (window == NULL)
             throw new RuntimeException("Failed to create the GLFW window");
 
@@ -114,7 +101,6 @@ public class RenderWindow {
         glClearColor(.1f, .1f, .1f, 1f);
 
         while (!glfwWindowShouldClose(window)) {
-            updateRenderableObjects();
             glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
             IntBuffer w = BufferUtils.createIntBuffer(1);
@@ -126,12 +112,16 @@ public class RenderWindow {
             glPushMatrix();
             glOrtho(-viewScale / 2, viewScale / 2, -viewScale / 2 * height / width, viewScale / 2 * height / width, -1, 1);
 
-            for (Renderable item : items) {
+            for (Object po : this.engine.getObjects().toArray()) {
+                if (!Renderable.class.isAssignableFrom(po.getClass())){
+                    continue;
+                }
+                Renderable item = (Renderable) po;
                 int[] indices = item.getIndices();
                 double[] vertices = item.getVertexData();
                 int primitive = item.getPrimitive();
-//                int stride = item.getStride();
-                int stride = 3;
+                int stride = item.getStride();
+//                int stride = 3;
 
                 glBegin(primitive);
                 for (int i : indices) {
@@ -141,6 +131,7 @@ public class RenderWindow {
                 }
                 glEnd();
             }
+
             glPopMatrix();
 
             glfwSwapBuffers(window);
